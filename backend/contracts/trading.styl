@@ -1,0 +1,19 @@
+#![no_std]
+#![no_main]
+
+use stylus_sdk::{prelude::*, types::*};
+
+#[stylus::contract]
+pub struct ForexTrading {
+    balances: Mapping<Address, U256>,
+}
+
+impl ForexTrading {
+    #[stylus::external]
+    pub fn trade(&mut self, user: Address, amount: U256, pair: String) -> bool {
+        let user_balance = self.balances.get(&user).unwrap_or(U256::zero());
+        require!(user_balance >= amount, "Insufficient balance");
+        self.balances.insert(user, user_balance - amount);
+        true
+    }
+}
